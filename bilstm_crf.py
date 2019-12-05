@@ -21,7 +21,6 @@ EMBEDDINGS_MODEL_FILE= None
 PAD = "PAD_SPECIAL_SYMBOL"
 UNK = "UNK_SPECIAL_SYMBOL"
 dictpath = "./dictionaries/biocrdict.dict"
-MAX_LEN = 100
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
