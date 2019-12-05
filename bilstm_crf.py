@@ -156,4 +156,4 @@ def pred2label(pred, idx2tag):
 
 if __name__ == '__main__':
     training_data = load_data("./data/processed_train.txt")
-    _, _, _, model, idx2tag = train_ner(training_data, pretrained_embedding=False)
+    _, _, _, model, idx2tag = train_ner(training_data, model_file='./models/bilstmcrf.model', pretrained_embedding=False)
