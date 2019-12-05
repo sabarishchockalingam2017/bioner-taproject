@@ -1,17 +1,10 @@
 from sklearn_crfsuite import CRF
 from sklearn.model_selection import cross_val_predict
 from sklearn_crfsuite.metrics import flat_classification_report
-import re
-import pandas as pd
-from progressbar import ProgressBar
-from nltk.tokenize import word_tokenize
 import pickle
 import os
 import errno
 from helpers import *
-
-
-
 
 
 if __name__ == '__main__':

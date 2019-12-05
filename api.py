@@ -28,7 +28,7 @@ class BioNER(Resource):
         label = model.predict([text2features(user_query)])
         taggedout = [tokd[l]+' - ' + label[0][l] for l in range(len(label[0])) if label[0][l] in ['B', 'I']]
         # create JSON object
-        output = {'text': user_query, 'NER tag': taggedout}
+        output = {'Gene/Protein': taggedout}
 
         return output
 

@@ -16,7 +16,7 @@ from keras_contrib.utils import save_load_utils
 from seqeval.metrics import precision_score, recall_score, f1_score, classification_report
 
 EMBEDDING_DIM=20
-EMBEDDINGS_MODEL_FILE='/Users/ema/code/word2vec/text8.bin'
+EMBEDDINGS_MODEL_FILE= None
 
 PAD = "PAD_SPECIAL_SYMBOL"
 UNK = "UNK_SPECIAL_SYMBOL"
@@ -155,6 +155,5 @@ def pred2label(pred, idx2tag):
 
 
 if __name__ == '__main__':
-    # obtained from https://noisy-text.github.io/2017/files/wnut17train.conll (https://noisy-text.github.io/2017/emerging-rare-entities.html)
     training_data = load_data("./data/processed_train.txt")
     _, _, _, model, idx2tag = train_ner(training_data, pretrained_embedding=False)
