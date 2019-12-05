@@ -20,6 +20,8 @@ EMBEDDINGS_MODEL_FILE= None
 
 PAD = "PAD_SPECIAL_SYMBOL"
 UNK = "UNK_SPECIAL_SYMBOL"
+dictpath = "./dictionaries/biocrdict.dict"
+MAX_LEN = 100
 
 logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -70,7 +72,7 @@ def train_ner(examples, model_file=None, epochs=30, validation_split=0.05, test_
 
     n_tags = len(tags)
 
-    dictionary = create_dict_train_file_ner(texts + [[UNK, PAD]], DICTFILE="./dictionaries/biocrdict.dict")
+    dictionary = create_dict_train_file_ner(texts + [[UNK, PAD]], DICTFILE=dictpath)
     n_words = len(dictionary)
     print("dictionary size: %s" % n_words)
     a = np.array(lengths)
@@ -140,7 +142,7 @@ def train_ner(examples, model_file=None, epochs=30, validation_split=0.05, test_
     pred_labels = pred2label(test_pred, idx2tag)
     test_labels = pred2label(y_test, idx2tag)
     print(classification_report(test_labels, pred_labels))
-    return val_loss, val_crf_viterbi_accuracy, len(examples), model, idx2tag
+    return max_len, val_loss, val_crf_viterbi_accuracy, len(examples), model, idx2tag
 
 
 def pred2label(pred, idx2tag):
@@ -156,4 +158,22 @@ def pred2label(pred, idx2tag):
 
 if __name__ == '__main__':
     training_data = load_data("./data/processed_train.txt")
-    _, _, _, model, idx2tag = train_ner(training_data, model_file='./models/bilstmcrf.model', pretrained_embedding=False)
+    testing_data = load_data("./data/processed_test.txt")
+    max_len, _, _, _, model, idx2tag = train_ner(training_data, model_file='./models/bilstmcrf.model', pretrained_embedding=False)
+
+    loaddict = gensim.corpora.Dictionary.load(dictpath)
+    word2idx = loaddict.token2id
+    n_tags = len(idx2tag)
+    tag2idx = {v: k for k, v in idx2tag.items()}
+    X_test = [[word2idx[w[0]] if w[0] in word2idx else word2idx[UNK] for w in s] for s in testing_data]
+    X_test = pad_sequences(maxlen=max_len, sequences=X_test, padding="post", value=word2idx[PAD])
+    y_test = [[tag2idx[w[1]] for w in s] for s in testing_data]
+    y_test = pad_sequences(maxlen=max_len, sequences=y_test, padding="post", value=tag2idx['O'])
+    y_test = [to_categorical(i, num_classes=n_tags) for i in y_test]
+
+    testpreds = model.predict(X_test)
+    testpreds = pred2label(testpreds, idx2tag)
+    test_labels = pred2label(y_test, idx2tag)
+    testreport = classification_report(test_labels, testpreds)
+    print("Test Report: ")
+    print(testreport)
